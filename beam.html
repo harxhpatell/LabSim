@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beam Deflection Simulator — LabSim NIT</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/iconfont/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  .lab-header{padding:24px 32px 0}
+  .lab-title{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+  .lab-title h1{font-size:24px;font-weight:700;letter-spacing:-.01em}
+  .code-tag{font-family:var(--font-mono);font-size:11px;color:var(--cyan);border:1px solid var(--cyan-dim);padding:2px 9px;border-radius:20px}
+  .lab-sub{color:var(--muted);font-size:13.5px;max-width:640px;margin-top:6px}
+
+  .lab-grid{
+    display:grid;grid-template-columns:300px 1fr;gap:20px;
+    padding:24px 32px 56px;max-width:1120px;margin:0 auto;
+  }
+  @media (max-width:860px){.lab-grid{grid-template-columns:1fr}}
+
+  .panel{border:1px solid var(--border);border-radius:var(--radius);background:var(--panel);padding:20px}
+  .panel h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:16px;font-weight:600}
+
+  .field{margin-bottom:18px}
+  .field label{display:block;font-size:12.5px;color:var(--text);margin-bottom:7px}
+  .num-wrap{position:relative}
+  .num-wrap input{
+    width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:7px;
+    color:var(--text);font-family:var(--font-mono);font-size:14px;padding:9px 46px 9px 12px;
+  }
+  .num-wrap input:focus{outline:none;border-color:var(--cyan-dim)}
+  .num-wrap .unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:11px;color:var(--muted-2)}
+
+  .readout{border-top:1px solid var(--border);padding-top:18px}
+  .readout-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .readout-row .k{font-size:12.5px;color:var(--muted)}
+  .readout-row .v{font-family:var(--font-mono);font-size:14px;color:var(--text)}
+  .badge{font-family:var(--font-mono);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+
+  .stage{display:flex;flex-direction:column;gap:16px}
+  .diagram-panel{border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+  .diagram-panel h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;font-weight:600}
+  #beamSvg{width:100%;height:220px}
+  #bmdSvg{width:100%;height:140px}
+
+  .axis path,.axis line{stroke:var(--border)}
+  .axis text{fill:var(--muted-2);font-family:var(--font-mono);font-size:9.5px}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">
+    <div class="mark">LS</div>
+    <div>LabSim NIT<small>Virtual Civil Engineering Lab</small></div>
+  </div>
+  <div class="navlinks"><a href="index.html">All experiments</a></div>
+  <a class="nav-gh" href="https://github.com/harxhpatell" target="_blank" rel="noopener"><i class="ti ti-brand-github"></i> GitHub</a>
+</nav>
+
+<a class="backlink" href="index.html"><i class="ti ti-arrow-left"></i> Back to experiments</a>
+
+<div class="lab-header">
+  <div class="lab-title">
+    <h1>Beam Deflection</h1>
+    <span class="code-tag">IS 456</span>
+  </div>
+  <p class="lab-sub">A simply-supported beam under a centre point load. Set the span, load and second moment of area, and check the deflection against the IS 456 serviceability limit of L/360.</p>
+</div>
+
+<div class="lab-grid">
+
+  <div class="panel">
+    <h2>Inputs</h2>
+
+    <div class="field">
+      <label>Span, L</label>
+      <div class="num-wrap"><input type="number" id="inL" value="4" min="2" max="8" step="0.1"><span class="unit">m</span></div>
+    </div>
+    <div class="field">
+      <label>Point load, W (at centre)</label>
+      <div class="num-wrap"><input type="number" id="inW" value="10" min="1" max="50" step="0.5"><span class="unit">kN</span></div>
+    </div>
+    <div class="field">
+      <label>Moment of inertia, I</label>
+      <div class="num-wrap"><input type="number" id="inI" value="15000" min="2000" max="50000" step="500"><span class="unit">cm⁴</span></div>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>Modulus of elasticity, E</label>
+      <div class="num-wrap"><input type="number" value="25000" disabled style="opacity:.55"><span class="unit">N/mm²</span></div>
+    </div>
+
+    <div class="readout">
+      <h2 style="margin-bottom:14px">Result</h2>
+      <div class="readout-row"><span class="k">Max deflection δ</span><span class="v" id="deflVal">— mm</span></div>
+      <div class="readout-row"><span class="k">Limit (L/360)</span><span class="v" id="limitVal">— mm</span></div>
+      <div class="readout-row"><span class="k">Max moment</span><span class="v" id="momentVal">— kN·m</span></div>
+      <div class="readout-row"><span class="k">Check</span><span class="badge" id="checkBadge">—</span></div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="diagram-panel">
+      <h2>Deflected shape</h2>
+      <svg id="beamSvg"></svg>
+    </div>
+    <div class="diagram-panel">
+      <h2>Bending moment diagram</h2>
+      <svg id="bmdSvg"></svg>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>LabSim NIT — Phase 1 · Step 04/04</span>
+  <a href="index.html">← All experiments</a>
+</footer>
+
+<script>
+const E = 25000; // N/mm^2, assumed for M25 concrete
+
+function compute(Lm, Wkn, Icm4){
+  const L = Lm*1000;        // mm
+  const W = Wkn*1000;       // N
+  const I = Icm4*1e4;       // mm^4
+  const deflection = (W*Math.pow(L,3))/(48*E*I); // mm
+  const limit = L/360;      // mm
+  const maxMoment = (Wkn*Lm)/4; // kN.m
+  return {deflection, limit, maxMoment, L, W, I};
+}
+
+// deflection shape for 0<=x<=L/2 (mm units), mirrored for x>L/2
+function deflectionAt(x, L, W, I){
+  if(x > L/2) x = L - x;
+  return (W*x*(3*L*L - 4*x*x)) / (48*E*I);
+}
+
+/* ---------------- beam SVG ---------------- */
+const beamSvg = d3.select('#beamSvg');
+const bmdSvg = d3.select('#bmdSvg');
+const marginB = {top:30,right:24,bottom:26,left:44};
+
+function drawBeam(Lm, Wkn, Icm4, deflection){
+  beamSvg.selectAll('*').remove();
+  const box = document.getElementById('beamSvg').getBoundingClientRect();
+  const w = box.width - marginB.left - marginB.right;
+  const h = box.height - marginB.top - marginB.bottom;
+  const g = beamSvg.append('g').attr('transform',`translate(${marginB.left},${marginB.top})`);
+
+  const L = Lm*1000, W = Wkn*1000, I = Icm4*1e4;
+  const x = d3.scaleLinear().domain([0,L]).range([0,w]);
+  // exaggerate deflection visually so small mm values are visible
+  const maxDefl = deflectionAt(L/2, L, W, I);
+  const exaggeration = maxDefl > 0 ? Math.min(40, (h*0.35)/maxDefl) : 1;
+  const y = d3.scaleLinear().domain([0, h/exaggeration]).range([0,h]);
+
+  // undeformed beam (dashed reference)
+  g.append('line').attr('x1',0).attr('x2',w).attr('y1',0).attr('y2',0)
+    .attr('stroke','#3a4a68').attr('stroke-width',1.5).attr('stroke-dasharray','5,4');
+
+  // deflected beam path
+  const pts = d3.range(0, L+1, L/100).map(px => ({px, py: deflectionAt(px,L,W,I)}));
+  const line = d3.line().x(d=>x(d.px)).y(d=>y(d.py)).curve(d3.curveNatural);
+  g.append('path').datum(pts).attr('fill','none').attr('stroke','var(--cyan)').attr('stroke-width',2.5).attr('d',line);
+
+  // supports (triangles) at both ends
+  [0,L].forEach(px=>{
+    g.append('path')
+      .attr('d', `M ${x(px)-9},${16} L ${x(px)+9},${16} L ${x(px)},${2} Z`)
+      .attr('fill','#4fd1ff33').attr('stroke','var(--cyan-dim)');
+  });
+
+  // load arrow at centre
+  const midY = y(deflectionAt(L/2,L,W,I));
+  g.append('line').attr('x1',x(L/2)).attr('x2',x(L/2)).attr('y1',midY-34).attr('y2',midY-4)
+    .attr('stroke','var(--amber)').attr('stroke-width',2).attr('marker-end','url(#arrowHead)');
+  g.append('text').attr('x',x(L/2)).attr('y',midY-38).attr('text-anchor','middle')
+    .attr('fill','var(--amber)').style('font',"11px 'IBM Plex Mono', monospace")
+    .text(`W = ${Wkn} kN`);
+
+  // arrow marker def
+  beamSvg.append('defs').append('marker')
+    .attr('id','arrowHead').attr('markerWidth',8).attr('markerHeight',8)
+    .attr('refX',4).attr('refY',4).attr('orient','auto')
+    .append('path').attr('d','M0,0 L8,4 L0,8 Z').attr('fill','var(--amber)');
+
+  // span dimension line
+  g.append('line').attr('x1',0).attr('x2',w).attr('y1',h+22).attr('y2',h+22)
+    .attr('stroke','#4a5262');
+  g.append('text').attr('x',w/2).attr('y',h+18).attr('text-anchor','middle')
+    .attr('fill','#7c8698').style('font',"10px 'IBM Plex Mono', monospace")
+    .text(`L = ${Lm} m`);
+}
+
+/* ---------------- BMD SVG ---------------- */
+function drawBMD(Lm, maxMoment){
+  bmdSvg.selectAll('*').remove();
+  const box = document.getElementById('bmdSvg').getBoundingClientRect();
+  const w = box.width - marginB.left - marginB.right;
+  const h = box.height - marginB.top - marginB.bottom;
+  const g = bmdSvg.append('g').attr('transform',`translate(${marginB.left},${marginB.top})`);
+
+  const x = d3.scaleLinear().domain([0,Lm]).range([0,w]);
+  const y = d3.scaleLinear().domain([0, maxMoment*1.15 || 1]).range([h,0]);
+
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`)
+    .call(d3.axisBottom(x).ticks(4).tickFormat(d=>d+'m'));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(4));
+
+  const pts = [{px:0,m:0},{px:Lm/2,m:maxMoment},{px:Lm,m:0}];
+  const line = d3.line().x(d=>x(d.px)).y(d=>y(d.m));
+  g.append('path').datum(pts).attr('fill','var(--amber)').attr('fill-opacity',0.15)
+    .attr('stroke','var(--amber)').attr('stroke-width',2)
+    .attr('d', d3.area().x(d=>x(d.px)).y0(h).y1(d=>y(d.m)));
+
+  g.append('text').attr('x',x(Lm/2)).attr('y',y(maxMoment)-8).attr('text-anchor','middle')
+    .attr('fill','var(--amber)').style('font',"11px 'IBM Plex Mono', monospace")
+    .text(`${maxMoment.toFixed(1)} kN·m`);
+}
+
+/* ---------------- wire up ---------------- */
+const inL = document.getElementById('inL');
+const inW = document.getElementById('inW');
+const inI = document.getElementById('inI');
+
+function render(){
+  const Lm = parseFloat(inL.value) || 0;
+  const Wkn = parseFloat(inW.value) || 0;
+  const Icm4 = parseFloat(inI.value) || 1;
+  const {deflection, limit, maxMoment} = compute(Lm, Wkn, Icm4);
+
+  document.getElementById('deflVal').textContent = deflection.toFixed(2) + ' mm';
+  document.getElementById('limitVal').textContent = limit.toFixed(2) + ' mm';
+  document.getElementById('momentVal').textContent = maxMoment.toFixed(2) + ' kN·m';
+
+  const badge = document.getElementById('checkBadge');
+  if(deflection <= limit){
+    badge.textContent = 'Pass'; badge.style.color='var(--green)'; badge.style.background='#0d3324';
+  } else {
+    badge.textContent = 'Fail'; badge.style.color='var(--red)'; badge.style.background='#3a1616';
+  }
+
+  drawBeam(Lm, Wkn, Icm4, deflection);
+  drawBMD(Lm, maxMoment);
+}
+
+[inL,inW,inI].forEach(el=>el.addEventListener('input', render));
+window.addEventListener('resize', render);
+render();
+</script>
+</body>
+</html>

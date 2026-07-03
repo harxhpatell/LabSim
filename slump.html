@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slump Test Simulator — LabSim NIT</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/iconfont/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  .lab-header{padding:24px 32px 0}
+  .lab-title{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+  .lab-title h1{font-size:24px;font-weight:700;letter-spacing:-.01em}
+  .code-tag{font-family:var(--font-mono);font-size:11px;color:var(--cyan);border:1px solid var(--cyan-dim);padding:2px 9px;border-radius:20px}
+  .lab-sub{color:var(--muted);font-size:13.5px;max-width:640px;margin-top:6px}
+
+  .lab-grid{
+    display:grid;grid-template-columns:320px 1fr;gap:20px;
+    padding:24px 32px 56px;max-width:1120px;margin:0 auto;
+  }
+  @media (max-width:860px){.lab-grid{grid-template-columns:1fr}}
+
+  .panel{
+    border:1px solid var(--border);border-radius:var(--radius);
+    background:var(--panel);padding:20px;
+  }
+  .panel h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:16px;font-weight:600}
+
+  .field{margin-bottom:22px}
+  .field-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+  .field-label span:first-child{font-size:13px;color:var(--text)}
+  .field-value{font-family:var(--font-mono);font-size:16px;font-weight:600;color:var(--cyan)}
+  input[type=range]{
+    width:100%;-webkit-appearance:none;height:4px;border-radius:2px;
+    background:var(--border);outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--cyan);cursor:pointer;border:3px solid #00141c;
+    box-shadow:0 0 0 1px var(--cyan);
+  }
+  .range-scale{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--muted-2);margin-top:6px}
+
+  .readout{border-top:1px solid var(--border);padding-top:18px}
+  .readout-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .readout-row .k{font-size:12.5px;color:var(--muted)}
+  .readout-row .v{font-family:var(--font-mono);font-size:14px;color:var(--text)}
+  .badge{
+    font-family:var(--font-mono);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;
+    text-transform:uppercase;letter-spacing:.04em;
+  }
+
+  .stage{
+    display:flex;flex-direction:column;gap:16px;
+  }
+  .stage-top{
+    border:1px solid var(--border);border-radius:var(--radius);
+    display:flex;align-items:center;justify-content:center;
+    padding:10px;position:relative;min-height:360px;
+  }
+  .stage-top canvas{max-width:100%}
+  .stage-caption{
+    position:absolute;bottom:12px;left:16px;
+    font-family:var(--font-mono);font-size:10px;color:var(--muted-2);
+  }
+  .graph-panel{border:1px solid var(--border);border-radius:var(--radius);padding:18px 18px 10px}
+  .graph-panel h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;font-weight:600}
+  .graph-legend{display:flex;gap:16px;font-family:var(--font-mono);font-size:10.5px;color:var(--muted);margin-bottom:6px}
+  .legend-item{display:flex;align-items:center;gap:6px}
+  .legend-swatch{width:14px;height:2px;display:inline-block}
+  #graph{width:100%;height:260px}
+
+  .axis path,.axis line{stroke:var(--border)}
+  .axis text{fill:var(--muted-2);font-family:var(--font-mono);font-size:10px}
+  .grid-line{stroke:var(--grid-line);stroke-width:1}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">
+    <div class="mark">LS</div>
+    <div>LabSim NIT<small>Virtual Civil Engineering Lab</small></div>
+  </div>
+  <div class="navlinks"><a href="index.html">All experiments</a></div>
+  <a class="nav-gh" href="https://github.com/harxhpatell" target="_blank" rel="noopener"><i class="ti ti-brand-github"></i> GitHub</a>
+</nav>
+
+<a class="backlink" href="index.html"><i class="ti ti-arrow-left"></i> Back to experiments</a>
+
+<div class="lab-header">
+  <div class="lab-title">
+    <h1>Slump Test</h1>
+    <span class="code-tag">IS 1199</span>
+  </div>
+  <p class="lab-sub">Measures the workability of fresh concrete. Fill the standard cone mould, lift it vertically, and measure how far the concrete slumps from the mould height of 300mm.</p>
+</div>
+
+<div class="lab-grid">
+
+  <div class="panel">
+    <h2>Inputs</h2>
+    <div class="field">
+      <div class="field-label">
+        <span>Water / Cement ratio</span>
+        <span class="field-value" id="wcVal">0.55</span>
+      </div>
+      <input type="range" id="wcSlider" min="0.40" max="0.80" step="0.01" value="0.55">
+      <div class="range-scale"><span>0.40</span><span>0.80</span></div>
+    </div>
+
+    <div class="readout">
+      <h2 style="margin-bottom:14px">Result</h2>
+      <div class="readout-row">
+        <span class="k">Slump</span>
+        <span class="v" id="slumpVal">30 mm</span>
+      </div>
+      <div class="readout-row">
+        <span class="k">Workability</span>
+        <span class="badge" id="workBadge">Medium</span>
+      </div>
+      <div class="readout-row">
+        <span class="k">Mould height</span>
+        <span class="v">300 mm</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="stage-top blueprint">
+      <canvas id="coneCanvas" width="320" height="340"></canvas>
+      <span class="stage-caption">FIG 01 — SLUMP CONE, SECTION VIEW</span>
+    </div>
+
+    <div class="graph-panel">
+      <h2>W/C ratio vs slump</h2>
+      <div class="graph-legend">
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--muted-2);border-top:1px dashed var(--muted-2)"></span>IS 1199 reference</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--cyan)"></span>Your result</span>
+      </div>
+      <svg id="graph"></svg>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>LabSim NIT — Phase 1 · Step 02/04</span>
+  <a href="index.html">← All experiments</a>
+</footer>
+
+<script>
+/* ---------------- formula ---------------- */
+// Simplified IS 1199 relationship used for this simulator:
+// slump (mm) = (w/c ratio - 0.40) * 200, clamped to [0, 80]
+function computeSlump(wc){
+  return Math.max(0, Math.min(80, (wc - 0.40) * 200));
+}
+
+function workabilityInfo(slump){
+  if(slump < 25) return {label:"Very Low", color:"var(--red)", bg:"#3a1616"};
+  if(slump < 50) return {label:"Low – Medium", color:"var(--amber)", bg:"#3a2b12"};
+  return {label:"High", color:"var(--green)", bg:"#0d3324"};
+}
+
+/* ---------------- canvas: slump cone ---------------- */
+const canvas = document.getElementById('coneCanvas');
+const ctx = canvas.getContext('2d');
+const CW = canvas.width, CH = canvas.height;
+const baseY = 300;          // baseline y-coordinate
+const mouldTopY = 40;       // top of 300mm mould, drawn dashed as reference
+const mouldBotW = 110, mouldTopW = 55; // px widths for bottom/top of mould (200mm/100mm dia scaled)
+const cx = CW/2;
+
+function drawCone(slump){
+  ctx.clearRect(0,0,CW,CH);
+
+  // ground line
+  ctx.strokeStyle = '#26406b';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(30, baseY); ctx.lineTo(CW-30, baseY);
+  ctx.stroke();
+
+  // dashed reference mould (300mm, undeformed)
+  ctx.setLineDash([4,4]);
+  ctx.strokeStyle = '#3a4a68';
+  ctx.beginPath();
+  ctx.moveTo(cx-mouldBotW/2, baseY);
+  ctx.lineTo(cx-mouldTopW/2, mouldTopY);
+  ctx.lineTo(cx+mouldTopW/2, mouldTopY);
+  ctx.lineTo(cx+mouldBotW/2, baseY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // slumped concrete: height shrinks with slump, top spreads outward
+  const pxPerMm = (baseY - mouldTopY) / 300; // scale factor
+  const slumpedTopY = mouldTopY + slump*pxPerMm;
+  const spread = slump * 0.55; // lateral bulge proportional to slump
+
+  const info = workabilityInfo(slump);
+  const fillColor = getComputedStyle(document.documentElement).getPropertyValue(
+    slump<25 ? '--red' : slump<50 ? '--amber' : '--green'
+  ).trim();
+
+  ctx.beginPath();
+  ctx.moveTo(cx-mouldBotW/2 - spread*0.3, baseY);
+  ctx.lineTo(cx-mouldTopW/2 - spread, slumpedTopY);
+  ctx.lineTo(cx+mouldTopW/2 + spread, slumpedTopY);
+  ctx.lineTo(cx+mouldBotW/2 + spread*0.3, baseY);
+  ctx.closePath();
+  ctx.fillStyle = fillColor + '33';
+  ctx.fill();
+  ctx.strokeStyle = fillColor;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // dimension line for slump amount
+  const dimX = cx + mouldBotW/2 + spread + 26;
+  ctx.strokeStyle = '#4a5262';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(dimX, mouldTopY); ctx.lineTo(dimX, slumpedTopY);
+  ctx.moveTo(dimX-4, mouldTopY); ctx.lineTo(dimX+4, mouldTopY);
+  ctx.moveTo(dimX-4, slumpedTopY); ctx.lineTo(dimX+4, slumpedTopY);
+  ctx.stroke();
+
+  ctx.fillStyle = '#7c8698';
+  ctx.font = '10px "IBM Plex Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(Math.round(slump)+'mm', dimX+8, (mouldTopY+slumpedTopY)/2+3);
+
+  // labels
+  ctx.fillStyle = '#4a5262';
+  ctx.textAlign = 'center';
+  ctx.fillText('300mm mould', cx, mouldTopY-14);
+}
+
+/* ---------------- D3 graph ---------------- */
+const margin = {top:14,right:18,bottom:26,left:38};
+const svg = d3.select('#graph');
+let gw, gh;
+
+function buildGraph(){
+  svg.selectAll('*').remove();
+  const bbox = document.getElementById('graph').getBoundingClientRect();
+  gw = bbox.width - margin.left - margin.right;
+  gh = bbox.height - margin.top - margin.bottom;
+
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0.40,0.80]).range([0,gw]);
+  const y = d3.scaleLinear().domain([0,80]).range([gh,0]);
+
+  // gridlines
+  g.append('g').attr('class','grid')
+    .selectAll('line').data(x.ticks(5)).enter().append('line')
+    .attr('class','grid-line')
+    .attr('x1',d=>x(d)).attr('x2',d=>x(d)).attr('y1',0).attr('y2',gh);
+  g.append('g').attr('class','grid')
+    .selectAll('line').data(y.ticks(5)).enter().append('line')
+    .attr('class','grid-line')
+    .attr('x1',0).attr('x2',gw).attr('y1',d=>y(d)).attr('y2',d=>y(d));
+
+  // axes
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${gh})`)
+    .call(d3.axisBottom(x).ticks(5).tickFormat(d3.format('.2f')));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(5));
+
+  // axis titles
+  svg.append('text').attr('x',margin.left+gw/2).attr('y',bbox.height-2)
+    .attr('text-anchor','middle').attr('fill','var(--muted-2)')
+    .style('font',"10px 'IBM Plex Mono', monospace").text('w/c ratio');
+  svg.append('text').attr('transform','rotate(-90)').attr('x',-(margin.top+gh/2)).attr('y',10)
+    .attr('text-anchor','middle').attr('fill','var(--muted-2)')
+    .style('font',"10px 'IBM Plex Mono', monospace").text('slump (mm)');
+
+  // reference curve (dashed) — the IS relationship itself
+  const curveData = d3.range(0.40,0.801,0.01).map(wc=>({wc,slump:computeSlump(wc)}));
+  const line = d3.line().x(d=>x(d.wc)).y(d=>y(d.slump));
+
+  g.append('path').datum(curveData)
+    .attr('fill','none').attr('stroke','#4a5262').attr('stroke-width',1.5)
+    .attr('stroke-dasharray','4,4').attr('d',line);
+
+  // live traced portion (solid cyan), and the moving dot
+  const liveLine = g.append('path')
+    .attr('fill','none').attr('stroke','var(--cyan)').attr('stroke-width',2);
+
+  const dot = g.append('circle').attr('r',5).attr('fill','var(--cyan)')
+    .attr('stroke','#00141c').attr('stroke-width',2);
+
+  return {x,y,curveData,line,liveLine,dot};
+}
+
+let graph = buildGraph();
+
+function updateGraph(wc){
+  const slump = computeSlump(wc);
+  const traced = graph.curveData.filter(d=>d.wc <= wc + 1e-9);
+  graph.liveLine.attr('d', graph.line(traced));
+  graph.dot.attr('cx', graph.x(wc)).attr('cy', graph.y(slump));
+}
+
+/* ---------------- wire up UI ---------------- */
+const slider = document.getElementById('wcSlider');
+const wcValEl = document.getElementById('wcVal');
+const slumpValEl = document.getElementById('slumpVal');
+const workBadge = document.getElementById('workBadge');
+
+function render(){
+  const wc = parseFloat(slider.value);
+  const slump = computeSlump(wc);
+  wcValEl.textContent = wc.toFixed(2);
+  slumpValEl.textContent = Math.round(slump) + ' mm';
+
+  const info = workabilityInfo(slump);
+  workBadge.textContent = info.label;
+  workBadge.style.color = info.color;
+  workBadge.style.background = info.bg;
+
+  drawCone(slump);
+  updateGraph(wc);
+}
+
+slider.addEventListener('input', render);
+window.addEventListener('resize', ()=>{ graph = buildGraph(); render(); });
+
+render();
+</script>
+</body>
+</html>

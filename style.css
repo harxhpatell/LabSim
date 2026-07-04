@@ -6,24 +6,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root{
-  --bg:#0a0c10;
-  --panel:#10141c;
-  --panel-2:#141924;
-  --blueprint:#0e1a2e;
-  --grid-line:#1c2c47;
-  --grid-line-strong:#26406b;
-  --border:#1e2534;
-  --cyan:#4fd1ff;
-  --cyan-dim:#2a5f78;
-  --amber:#ffb454;
+  --bg:#0a0a0a;
+  --panel:#141414;
+  --panel-2:#1a1a1a;
+  --blueprint:#0d0d0d;
+  --grid-line:#232016;
+  --grid-line-strong:#3d371f;
+  --border:#262626;
+  --cyan:#f5c518;
+  --cyan-dim:#7a6210;
+  --amber:#ff8a3d;
   --green:#4ade80;
   --red:#f87171;
-  --text:#e8ecf3;
-  --muted:#7c8698;
-  --muted-2:#4a5262;
-  --radius:10px;
+  --text:#f2f0ea;
+  --muted:#8a8a85;
+  --muted-2:#525250;
+  --radius:8px;
   --font-display:'Space Grotesk',sans-serif;
   --font-mono:'IBM Plex Mono',monospace;
+}
+
+/* signature motif — hazard stripe, used sparingly as a structural divider */
+.hazard-strip{
+  height:6px;width:100%;
+  background:repeating-linear-gradient(135deg,
+    var(--cyan) 0 14px,
+    #0a0a0a 14px 28px);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -58,14 +66,24 @@ a{color:inherit;text-decoration:none}
   background:var(--panel);
   position:sticky;top:0;z-index:20;
 }
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-0.01em}
+.brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:18px;letter-spacing:-0.01em}
 .brand .mark{
-  width:28px;height:28px;border-radius:6px;
-  background:linear-gradient(135deg,var(--cyan),var(--cyan-dim));
+  width:34px;height:34px;border-radius:7px;
+  position:relative;overflow:hidden;
+  background:repeating-linear-gradient(135deg,
+    var(--cyan) 0 6px,
+    #0a0a0a 6px 12px);
+  box-shadow:0 0 0 1px #000, 0 2px 6px rgba(0,0,0,.5);
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-mono);font-size:12px;font-weight:700;color:#00141c;
 }
-.brand small{display:block;font-family:var(--font-mono);font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.04em}
+.brand .mark::after{
+  content:'L';
+  width:22px;height:22px;border-radius:4px;
+  background:#0a0a0a;color:var(--cyan);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:14px;font-weight:700;
+}
+.brand small{display:block;font-family:var(--font-mono);font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.04em;margin-top:1px}
 .navlinks{display:flex;gap:28px;font-size:13px;color:var(--muted)}
 .navlinks a:hover{color:var(--cyan)}
 .nav-gh{

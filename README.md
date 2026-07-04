@@ -1,4 +1,4 @@
-# LabSim NIT
+# LabSim
 
 Browser-based virtual civil engineering lab, built for Tier-2/3 colleges without reliable lab access.
 

@@ -14,10 +14,11 @@ async function callViva(payload) {
 const TOTAL_QUESTIONS = 3;
 
 export default function VivaCoach({ experimentName, code, resultData, onFinish }) {
-  const [stage, setStage] = useState('idle'); // idle | loading | question | grading | finished | error
+  const [stage, setStage] = useState('idle'); // idle | loading | question | grading | feedback | finished | error
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [feedback, setFeedback] = useState(null); // { correct, feedback }
+  const [pendingNext, setPendingNext] = useState(null); // next question text, held until the student clicks Continue
   const [hint, setHint] = useState(null);
   const [hintLoading, setHintLoading] = useState(false);
   const [history, setHistory] = useState([]); // [{question, correct}]
@@ -33,6 +34,7 @@ export default function VivaCoach({ experimentName, code, resultData, onFinish }
       setQuestion(data.question);
       setHint(null);
       setFeedback(null);
+      setPendingNext(null);
       setAnswer('');
       setHistory([]);
       setScore(0);
@@ -70,22 +72,28 @@ export default function VivaCoach({ experimentName, code, resultData, onFinish }
       setFeedback({ correct: data.correct, feedback: data.feedback });
 
       if (nextHistory.length >= TOTAL_QUESTIONS || !data.nextQuestion) {
-        setStage('finished');
-        const finalScore = score + (data.correct ? 1 : 0);
-        if (onFinish) onFinish({ score: finalScore, total: TOTAL_QUESTIONS });
+        setPendingNext(null); // no next question — "Continue" will show the final score
       } else {
-        // brief pause so the student can read feedback before the next question loads
-        setTimeout(() => {
-          setQuestion(data.nextQuestion);
-          setAnswer('');
-          setHint(null);
-          setFeedback(null);
-          setStage('question');
-        }, 1600);
+        setPendingNext(data.nextQuestion);
       }
+      setStage('feedback');
     } catch (err) {
       setErrorMsg(err.message);
       setStage('error');
+    }
+  }
+
+  function continueToNext() {
+    if (pendingNext) {
+      setQuestion(pendingNext);
+      setAnswer('');
+      setHint(null);
+      setFeedback(null);
+      setPendingNext(null);
+      setStage('question');
+    } else {
+      setStage('finished');
+      if (onFinish) onFinish({ score, total: TOTAL_QUESTIONS });
     }
   }
 
@@ -93,7 +101,7 @@ export default function VivaCoach({ experimentName, code, resultData, onFinish }
     <div className="viva-panel">
       <div className="viva-header">
         <h2>AI Viva Coach</h2>
-        {stage === 'question' || stage === 'grading' ? (
+        {stage === 'question' || stage === 'grading' || stage === 'feedback' ? (
           <span className="viva-progress">Question {history.length + 1} of {TOTAL_QUESTIONS}</span>
         ) : null}
       </div>
@@ -113,32 +121,34 @@ export default function VivaCoach({ experimentName, code, resultData, onFinish }
 
           {hint && <div className="viva-bubble viva-bubble-hint">💡 {hint}</div>}
 
-          {feedback && (
-            <div className={`viva-bubble ${feedback.correct ? 'viva-bubble-correct' : 'viva-bubble-incorrect'}`}>
-              {feedback.correct ? '✓ ' : '✗ '}{feedback.feedback}
-            </div>
-          )}
+          <textarea
+            className="viva-input"
+            rows={3}
+            placeholder="Type your answer…"
+            value={answer}
+            onChange={e => setAnswer(e.target.value)}
+            disabled={stage === 'grading'}
+          />
+          <div className="row-actions">
+            <button className="btn btn-primary btn-sm" onClick={submitAnswer} disabled={stage === 'grading' || !answer.trim()}>
+              {stage === 'grading' ? 'Grading…' : 'Submit answer'}
+            </button>
+            <button className="btn btn-ghost btn-sm" onClick={getHint} disabled={hintLoading || !!hint || stage === 'grading'}>
+              {hintLoading ? 'Loading hint…' : 'Give me a hint'}
+            </button>
+          </div>
+        </div>
+      )}
 
-          {!feedback && (
-            <>
-              <textarea
-                className="viva-input"
-                rows={3}
-                placeholder="Type your answer…"
-                value={answer}
-                onChange={e => setAnswer(e.target.value)}
-                disabled={stage === 'grading'}
-              />
-              <div className="row-actions">
-                <button className="btn btn-primary btn-sm" onClick={submitAnswer} disabled={stage === 'grading' || !answer.trim()}>
-                  {stage === 'grading' ? 'Grading…' : 'Submit answer'}
-                </button>
-                <button className="btn btn-ghost btn-sm" onClick={getHint} disabled={hintLoading || !!hint || stage === 'grading'}>
-                  {hintLoading ? 'Loading hint…' : 'Give me a hint'}
-                </button>
-              </div>
-            </>
-          )}
+      {stage === 'feedback' && (
+        <div className="viva-body">
+          <div className="viva-bubble viva-bubble-ai">{question}</div>
+          <div className={`viva-bubble ${feedback.correct ? 'viva-bubble-correct' : 'viva-bubble-incorrect'}`}>
+            {feedback.correct ? '✓ ' : '✗ '}{feedback.feedback}
+          </div>
+          <button className="btn btn-primary btn-sm" onClick={continueToNext}>
+            {pendingNext ? 'Next question' : 'See my score'}
+          </button>
         </div>
       )}
 

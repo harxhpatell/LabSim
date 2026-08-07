@@ -69,10 +69,30 @@ button{font-family:inherit;cursor:pointer}
   display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:14px;font-weight:700;
 }
 .brand small{display:block;font-family:var(--font-mono);font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.04em;margin-top:1px;white-space:nowrap}
-.navlinks{display:flex;gap:22px;font-size:13px;color:var(--muted)}
+.navlinks{display:flex;align-items:center;gap:22px;font-size:13px;color:var(--muted)}
 .navlinks a:hover, .navlinks a.active{color:var(--cyan)}
 .nav-gh{font-family:var(--font-mono);font-size:12px;color:var(--muted);border:1px solid var(--border);padding:6px 12px;border-radius:6px;white-space:nowrap}
 .nav-gh:hover{border-color:var(--cyan-dim);color:var(--cyan)}
+
+/* Discipline dropdown groups (Civil / Mechanical) */
+.nav-dropdown{position:relative}
+.nav-dropdown-trigger{
+  display:flex;align-items:center;gap:5px;background:transparent;border:none;
+  font-family:var(--font-display);font-size:13px;color:var(--muted);cursor:pointer;padding:0;
+}
+.nav-dropdown-trigger:hover, .nav-dropdown-trigger.is-open{color:var(--cyan)}
+.nav-dropdown-trigger .chev{font-size:9px;transition:transform .15s}
+.nav-dropdown-trigger.is-open .chev{transform:rotate(180deg)}
+.nav-dropdown-panel{
+  position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%);
+  background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:8px;display:flex;flex-direction:column;gap:2px;min-width:170px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:40;
+}
+.nav-dropdown-panel a{
+  font-size:13px;color:var(--text);padding:8px 10px;border-radius:5px;white-space:nowrap;
+}
+.nav-dropdown-panel a:hover, .nav-dropdown-panel a.active{background:var(--panel-2);color:var(--cyan)}
 
 /* Hamburger toggle — hidden on desktop, shown on mobile */
 .nav-toggle{
@@ -91,12 +111,17 @@ button{font-family:inherit;cursor:pointer}
   .navlinks-desktop, .nav-gh-desktop{display:none}
   .nav-toggle{display:flex}
   .mobile-menu{
-    display:block;max-height:0;overflow:hidden;background:var(--panel);
-    border-bottom:1px solid var(--border);transition:max-height .2s ease;
+    display:block;max-height:0;overflow:hidden;overflow-y:auto;background:var(--panel);
+    border-bottom:1px solid var(--border);transition:max-height .25s ease;
   }
-  .mobile-menu.is-open{max-height:400px}
-  .mobile-menu .navlinks-mobile{flex-direction:column;gap:0;padding:8px 24px}
-  .mobile-menu .navlinks-mobile a{padding:12px 0;border-bottom:1px solid var(--border);font-size:14px}
+  .mobile-menu.is-open{max-height:80vh}
+  .mobile-menu .navlinks-mobile{display:flex;flex-direction:column;gap:0;padding:8px 24px}
+  .mobile-menu .navlinks-mobile a{padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text)}
+  .mobile-menu .navlinks-mobile a.active{color:var(--cyan)}
+  .mobile-group-label{
+    font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cyan);padding:14px 0 4px;
+  }
   .mobile-menu .nav-gh{display:block;text-align:center;margin:14px 24px 18px}
 }
 

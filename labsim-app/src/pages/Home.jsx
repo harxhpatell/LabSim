@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-const experiments = [
+const civilExperiments = [
   { to: '/slump', status: 'Live', code: 'IS 1199', name: 'Slump Test',
     desc: 'Adjust the water/cement ratio and watch the concrete cone slump in real time, plotted against the IS 1199 reference curve.' },
   { to: '/beam', status: 'Live', code: 'IS 456', name: 'Beam Deflection',
@@ -13,6 +13,15 @@ const experiments = [
     desc: 'Enter the failure load for 3 concrete cubes and check the mean compressive strength against the target grade.' },
   { to: '/proctor', status: 'Live', code: 'IS 2720-7', name: 'Compaction Test',
     desc: 'Enter moisture content and wet mass readings to plot the Proctor compaction curve and read off OMC and MDD.' },
+];
+
+const mechanicalExperiments = [
+  { to: '/tension', status: 'Live', code: 'IS 1608', name: 'Tension Test',
+    desc: 'Enter load readings at each extension to build a mild-steel stress-strain curve and read off Young\u2019s modulus, yield strength, UTS, and elongation.' },
+  { to: '/torsion', status: 'Live', code: 'IS 1717', name: 'Torsion Test',
+    desc: 'Enter torque readings at each twist angle to determine the shear modulus of a specimen from the torque-twist curve.' },
+  { to: '/impact', status: 'Live', code: 'IS 1598', name: 'Impact Test (Izod)',
+    desc: 'Enter the pendulum\u2019s rise angle after impact to calculate energy absorbed and classify the specimen\u2019s toughness.' },
 ];
 
 function ExperimentCard({ exp }) {
@@ -35,6 +44,8 @@ function ExperimentCard({ exp }) {
 }
 
 export default function Home() {
+  const total = civilExperiments.length + mechanicalExperiments.length;
+
   return (
     <>
       <header className="hero blueprint">
@@ -43,16 +54,16 @@ export default function Home() {
         <span className="tick" style={{ bottom: 18, left: 18 }}>SHEET 01/05</span>
         <span className="tick" style={{ bottom: 18, right: 18 }}>SCALE 1:1</span>
         <div className="hero-inner">
-          <div className="eyebrow" style={{ justifyContent: 'center' }}>NIT AGARTALA · DEPT. OF CIVIL ENGINEERING</div>
+          <div className="eyebrow" style={{ justifyContent: 'center' }}>NIT AGARTALA · CIVIL &amp; MECHANICAL LABS</div>
           <h1>The lab your college<br />couldn't <span className="accent">afford to build.</span></h1>
-          <p>Six standard IS-code experiments, simulated in the browser — slump cone to soil compaction. Built for Tier-2/3 colleges where physical lab access is limited, exam season is short, and a real result should still mean something.</p>
+          <p>{total} standard code-based experiments, simulated in the browser — concrete slump to steel tension. Built for Tier-2/3 colleges where physical lab access is limited, exam season is short, and a real result should still mean something.</p>
           <div className="hero-actions">
             <Link className="btn btn-primary" to="/slump">Try the slump test</Link>
             <a className="btn btn-ghost" href="#experiments">See all experiments</a>
           </div>
           <div className="hero-stats">
-            <div className="stat"><b>6</b><span>Experiments live</span></div>
-            <div className="stat"><b>IS 456</b><span>Code reference</span></div>
+            <div className="stat"><b>{total}</b><span>Experiments live</span></div>
+            <div className="stat"><b>2</b><span>Disciplines</span></div>
             <div className="stat"><b>AI</b><span>Viva coach</span></div>
           </div>
         </div>
@@ -60,10 +71,20 @@ export default function Home() {
 
       <section className="section" id="experiments">
         <div className="wrap">
-          <h2>Experiments</h2>
-          <p className="sub">Six interactive simulations, one shared layout, an AI viva coach on every one.</p>
+          <h2>Civil Engineering</h2>
+          <p className="sub">Concrete, soil, and structural experiments referenced to IS codes.</p>
           <div className="grid">
-            {experiments.map((exp) => <ExperimentCard exp={exp} key={exp.name} />)}
+            {civilExperiments.map((exp) => <ExperimentCard exp={exp} key={exp.name} />)}
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="wrap">
+          <h2>Mechanical Engineering</h2>
+          <p className="sub">Material testing experiments — tension, torsion, and impact.</p>
+          <div className="grid">
+            {mechanicalExperiments.map((exp) => <ExperimentCard exp={exp} key={exp.name} />)}
           </div>
         </div>
       </section>
@@ -76,7 +97,7 @@ export default function Home() {
             <div className="stepitem">
               <div className="n">01</div>
               <h4>Pick an experiment</h4>
-              <p>Every simulation matches a real IS-code procedure your syllabus already covers.</p>
+              <p>Every simulation matches a real code-based procedure your syllabus already covers.</p>
             </div>
             <div className="stepitem">
               <div className="n">02</div>
@@ -86,12 +107,12 @@ export default function Home() {
             <div className="stepitem">
               <div className="n">03</div>
               <h4>Read the live result</h4>
-              <p>Graphs and readouts update instantly, referenced against the IS standard curve.</p>
+              <p>Graphs and readouts update instantly, referenced against the standard curve.</p>
             </div>
             <div className="stepitem">
               <div className="n">04</div>
               <h4>Submit &amp; learn</h4>
-              <p>AI viva, PDF lab manuals and teacher dashboards are coming in Phase 3.</p>
+              <p>Take the AI viva, download a lab manual PDF, and save your result to your dashboard.</p>
             </div>
           </div>
         </div>

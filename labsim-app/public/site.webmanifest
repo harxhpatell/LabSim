@@ -1,7 +1,7 @@
 {
-  "name": "LabSim — Virtual Civil Engineering Lab",
+  "name": "LabSim — Virtual Engineering Lab",
   "short_name": "LabSim",
-  "description": "Browser-based civil engineering lab simulations for colleges without physical lab access.",
+  "description": "Browser-based civil and mechanical engineering lab simulations for colleges without physical lab access.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0a0a0a",

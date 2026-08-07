@@ -1,115 +1,151 @@
 # LabSim
 
-A browser-based virtual civil engineering lab — built for Tier-2/3 colleges where
-physical lab access is limited, but the syllabus still expects a real result.
+I go to a Tier-2 college where the civil and mechanical labs are... let's just say
+"functional." Half the equipment is old, slots fill up fast before exams, and if
+you miss your turn you're basically copying someone else's readings. So I built
+LabSim — a browser-based lab where you can actually run the experiment yourself,
+get a real (simulated) result based on real formulas, and even get grilled on it
+by an AI afterward like an actual viva.
 
 **Live:** `https://lab-sim-omega.vercel.app/#/`
-**Built by:** [Harsh Patel](https://github.com/harxhpatell) — B.Tech Civil Engineering, NIT Agartala
+**Me:** [Harsh Patel](https://github.com/harxhpatell) — B.Tech Civil Engineering, NIT Agartala
 
 ---
 
-## What it does
+## What's actually in it
 
-Six standard IS-code experiments, simulated in the browser with real formulas and
-live graphs — not canned animations:
+9 experiments across civil and mechanical engineering right now. Every one of them
+uses the real formula from the actual code — I'm not faking a curve, the math runs
+live off whatever numbers you type in.
 
-| Experiment | IS Code | What it simulates |
+**Civil:**
+
+| Experiment | Code | What it does |
 |---|---|---|
-| Slump Test | IS 1199 | Concrete workability from water/cement ratio, with a canvas-drawn cone and a live D3 curve |
-| Beam Deflection | IS 456 | A simply-supported beam's mid-span deflection under a centre point load, checked against the L/360 limit |
-| Sieve Analysis | IS 2386 | Particle-size distribution from retained weights, plotted as a grain-size curve with fineness modulus |
-| CBR Test | IS 2720-16 | California Bearing Ratio from a load-penetration curve, read off at 2.5mm and 5mm |
-| Cube Crushing Test | IS 516 | Compressive strength of 3 concrete cubes from failure load, checked against the target grade (fck) |
-| Compaction Test | IS 2720-7 | Standard Proctor test — dry density vs moisture content curve, reads off OMC and Max. Dry Density |
+| Slump Test | IS 1199 | Type in a w/c ratio, watch a canvas-drawn cone slump, plotted live against the IS curve |
+| Beam Deflection | IS 456 | Set span/load/I, watch a simply-supported beam actually bend, checked against L/360 |
+| Sieve Analysis | IS 2386 | Enter retained weights, get the gradation curve + fineness modulus |
+| CBR Test | IS 2720-16 | Enter load-penetration readings, read CBR% at 2.5mm and 5mm off the curve |
+| Cube Crushing | IS 516 | Enter failure loads for 3 cubes, check mean strength against target grade |
+| Compaction Test | IS 2720-7 | Enter moisture/wet-mass readings, get the Proctor curve with OMC and MDD marked |
 
-On top of the experiments themselves:
+**Mechanical (new):**
 
-- 🤖 **AI Viva Coach** — after finishing an experiment, get asked 3 conceptual
-  questions grounded in your actual results, graded live, with hints on request
-- 📄 **PDF Lab Manual** — download a formatted lab report (aim, procedure,
-  inputs, results, observation table, viva score) for any experiment, one click
-- 👤 **Student accounts** — optional sign-in to save every attempt and viva score
-  to a personal dashboard. Everything still works fully without an account.
+| Experiment | Code | What it does |
+|---|---|---|
+| Tension Test | IS 1608 | Enter load at each extension, get the full stress-strain curve — E, yield, UTS, % elongation |
+| Torsion Test | IS 1717 | Enter torque at each twist angle, get the shear modulus off the torque-twist slope |
+| Impact Test (Izod) | IS 1598 | Enter the pendulum's rise angle after breaking a specimen, get energy absorbed + toughness |
+
+On top of that:
+
+- 🤖 **AI Viva Coach** — after you finish an experiment, it asks you 3 questions based
+  on *your* actual result, not a generic question bank. Grades your answer, gives a
+  hint if you're stuck, tracks your score.
+- 📄 **PDF Lab Manual** — one click and you get an actual formatted lab report:
+  aim, procedure, your inputs, your results, the observation table, your viva score.
+- 👤 **Accounts** — sign in (totally optional) and every attempt gets saved to a
+  dashboard so you can see your history. Skip it and everything still works fine.
 
 ---
 
-## Tech stack
+## Why I built it this way
 
-- **Frontend:** React + Vite, React Router (`HashRouter`), D3.js for all graphs, `jsPDF` for reports
-- **AI:** Google Gemini (`gemini-2.5-flash`) via a Vercel serverless function — the API key never touches the browser
-- **Auth + database:** Supabase (email/password auth, Postgres with Row Level Security)
-- **Hosting:** Vercel (frontend + serverless functions in one deploy)
+**React + Vite** for the frontend, **D3** for every single graph (no chart library
+doing the thinking for me — I wanted the curves to actually be driven by the math).
+**Gemini** powers the viva coach, running through a small serverless function on
+Vercel so the API key never touches the browser. **Supabase** handles accounts —
+Postgres + Row Level Security, so even I can't see other people's saved attempts
+without going through the same auth everyone else does.
+
+I went with Vercel over plain GitHub Pages because the viva coach genuinely needs a
+backend (however small) to keep the API key safe — static hosting alone can't do that.
 
 ---
 
-## Project structure
+## Project layout
 
 ```
 labsim-app/
 ├── api/
-│   └── viva.js                serverless function — talks to Gemini, holds the API key
+│   └── viva.js                the only place the Gemini key lives
 ├── src/
-│   ├── App.jsx                 routes: / /slump /beam /sieve /cbr /cube /proctor /login /dashboard
-│   ├── index.css                design system (hazard-yellow/black theme), incl. mobile breakpoints
+│   ├── App.jsx                 all the routes
+│   ├── index.css                design system — hazard yellow/black, mobile-first
 │   ├── components/
-│   │   ├── NavBar.jsx            hamburger menu below 860px
-│   │   ├── Footer.jsx
-│   │   ├── ExperimentLayout.jsx shared shell every experiment plugs into
-│   │   └── VivaCoach.jsx         AI viva chat UI
-│   ├── context/
-│   │   └── AuthContext.jsx       Supabase session state
-│   ├── lib/
-│   │   └── supabaseClient.js
-│   ├── pages/
-│   │   ├── Home.jsx
-│   │   ├── Login.jsx
-│   │   └── Dashboard.jsx
-│   ├── experiments/
-│   │   ├── SlumpTest.jsx
-│   │   ├── BeamTest.jsx
-│   │   ├── SieveAnalysis.jsx
-│   │   ├── CBR.jsx
-│   │   ├── CubeCrushing.jsx
-│   │   └── CompactionTest.jsx
+│   │   ├── NavBar.jsx            Civil/Mechanical dropdowns + hamburger on mobile
+│   │   ├── ExperimentLayout.jsx  the shell every experiment plugs into
+│   │   └── VivaCoach.jsx         the viva chat UI
+│   ├── context/AuthContext.jsx
+│   ├── lib/supabaseClient.js
+│   ├── pages/ (Home, Login, Dashboard)
+│   ├── experiments/ (all 9, one file each)
 │   └── utils/
-│       ├── generateLabManual.js  PDF builder (jsPDF + autoTable)
-│       └── saveAttempt.js        writes to Supabase if logged in, no-op otherwise
-├── supabase/
-│   └── schema.sql               run once in Supabase's SQL editor
-├── vercel.json
-└── .env.example
+│       ├── generateLabManual.js  PDF builder
+│       └── saveAttempt.js        writes to Supabase if you're logged in
+├── supabase/schema.sql          run this once in Supabase's SQL editor
+└── vercel.json
 ```
 
 ---
 
-## Formulas used
+## Formulas, so you can check my work
 
-- **Slump (IS 1199):** `slump = (w/c ratio − 0.40) × 200`, clamped to 0–80mm
-- **Beam deflection (IS 456)**, centre point load, simply supported:
-  `δ = W·L³ / (48·E·I)`, checked against `L/360`. `E = 25,000 N/mm²` (M25 concrete assumed)
-- **Sieve analysis (IS 2386):** standard 6-sieve + pan set; fineness modulus = sum of
-  cumulative % retained on the six sieves ÷ 100
-- **CBR (IS 2720-16):** `CBR% = (test load / standard load) × 100` at 2.5mm
-  (standard load 13.24kN) and 5.0mm (standard load 19.93kN); the higher value governs
-- **Cube crushing (IS 516):** `strength = failure load / (150mm × 150mm)`, averaged
-  over 3 cubes and checked against the target grade (fck)
-- **Compaction test (IS 2720-7):** `dry density = bulk density / (1 + moisture fraction)`,
-  where bulk density = wet mass ÷ standard Proctor mould volume (1000 cm³); OMC/MDD
-  read off the peak of the entered data points
+- **Slump:** `slump = (w/c − 0.40) × 200`, clamped 0–80mm
+- **Beam deflection:** `δ = WL³/(48EI)`, checked against L/360, E = 25,000 N/mm² (M25 assumed)
+- **Sieve:** fineness modulus = Σ(cumulative % retained on the 6 standard sieves) ÷ 100
+- **CBR:** `CBR% = (test load / standard load) × 100` at 2.5mm (13.24kN) and 5mm (19.93kN), higher governs
+- **Cube crushing:** `strength = load / (150×150)`, averaged over 3 cubes vs fck
+- **Compaction:** `dry density = bulk density / (1 + moisture fraction)`, OMC/MDD from the peak of the curve
+- **Tension:** stress = load/area, strain = extension/gauge length, E from the elastic-region slope
+- **Torsion:** `G = T·L / (J·θ)`, averaged across readings
+- **Impact:** `E = W·R·(cos β − cos α)`
 
----
-## Roadmap
-
-- [x] **Phase 1** — static HTML/CSS/JS build, hazard-yellow branding
-- [x] **Phase 2** — React + Vite migration, shared `ExperimentLayout`, Sieve Analysis + CBR added
-- [x] **Phase 3** — AI Viva Coach (Gemini), PDF lab manual generator, Supabase auth + dashboard
-- [x] **Phase 4a** — Mobile responsiveness pass (hamburger nav, scrollable tables, tighter spacing on small screens)
-- [x] **Phase 4b** — Cube Crushing (IS 516) and Compaction Test (IS 2720-7) added — 6 experiments live
-- [ ] **Phase 4c** — Demo video, further polish
+A few of these are simplified on purpose (I say so in the app where it matters) —
+this is a teaching tool, not a certified testing machine. The point is understanding
+the shape of the relationship, not decimal-perfect lab-grade precision.
 
 ---
 
-## License
+## Running it yourself
 
-Not yet licensed — all rights reserved by default. Add a `LICENSE` file if you want to
-open this up for others to use or contribute to.
+```bash
+git clone https://github.com/harxhpatell/LabSim.git
+cd LabSim/labsim-app
+npm install
+```
+
+Copy `.env.example` to `.env.local`, fill in three things:
+
+```
+GEMINI_API_KEY=...        # aistudio.google.com/apikey — free tier, no card needed
+VITE_SUPABASE_URL=...     # supabase.com — new project, then Settings > API
+VITE_SUPABASE_ANON_KEY=...
+```
+
+Then, so the viva coach actually works locally (plain `npm run dev` won't serve the
+`/api` function):
+
+```bash
+npm install -g vercel
+vercel dev
+```
+
+For Supabase, also run `supabase/schema.sql` once in your project's SQL editor —
+that sets up the `attempts` table with Row Level Security.
+
+To deploy: import the repo on Vercel, add the same three env vars in
+Settings → Environment Variables (tick Production/Preview/Development for each),
+deploy. Every push to `main` redeploys automatically after that.
+
+---
+
+## Where this is headed
+
+Started as just a slump test simulator for a single assignment. Turned into this.
+Next up, probably: a couple more experiments (open to suggestions honestly), maybe
+a compressive/hardness test for mechanical, and eventually a proper demo video once
+I stop finding small things to fix.
+
+If you're at a college with the same lab-access problem and this is useful to you —
+that's really why I built it.

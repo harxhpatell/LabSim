@@ -11,6 +11,9 @@ import SieveAnalysis from './experiments/SieveAnalysis';
 import CBR from './experiments/CBR';
 import CubeCrushing from './experiments/CubeCrushing';
 import CompactionTest from './experiments/CompactionTest';
+import TensionTest from './experiments/TensionTest';
+import TorsionTest from './experiments/TorsionTest';
+import ImpactTest from './experiments/ImpactTest';
 
 export default function App() {
   return (
@@ -25,6 +28,9 @@ export default function App() {
           <Route path="/cbr" element={<CBR />} />
           <Route path="/cube" element={<CubeCrushing />} />
           <Route path="/proctor" element={<CompactionTest />} />
+          <Route path="/tension" element={<TensionTest />} />
+          <Route path="/torsion" element={<TorsionTest />} />
+          <Route path="/impact" element={<ImpactTest />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>

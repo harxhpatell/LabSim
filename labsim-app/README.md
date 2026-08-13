@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="LabSim" width="320">
+</p>
+
 # LabSim
 
 I go to a Tier-2 college where the civil and mechanical labs are... let's just say

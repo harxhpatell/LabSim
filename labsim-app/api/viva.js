@@ -1,6 +1,11 @@
+// Vercel serverless function: /api/viva
+// Keeps GEMINI_API_KEY server-side. Never call the Gemini API directly
+// from the browser — that would expose the key to anyone reading dev tools.
+//
+// Set GEMINI_API_KEY in your Vercel project's Environment Variables
+// (Project Settings -> Environment Variables), not in any committed file.
 
-
-const MODEL = 'gemini-2.5-flash'; 
+const MODEL = 'gemini-2.5-flash'; // cheap + fast, good fit for short viva Q&A
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
 async function callGemini(apiKey, { systemPrompt, userPrompt, jsonSchema, maxOutputTokens }) {
@@ -9,7 +14,7 @@ async function callGemini(apiKey, { systemPrompt, userPrompt, jsonSchema, maxOut
     contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
     generationConfig: {
       maxOutputTokens: maxOutputTokens || 400,
-      thinkingConfig: { thinkingBudget: 0 }, 
+      thinkingConfig: { thinkingBudget: 0 }, // short Q&A doesn't need extended thinking; avoids truncated output
       ...(jsonSchema ? { responseMimeType: 'application/json', responseSchema: jsonSchema } : {}),
     },
   };

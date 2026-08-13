@@ -1,27 +1,31 @@
 import { Link } from 'react-router-dom';
 import heroLogo from '../assets/hero-logo.png';
+import {
+  SlumpIcon, BeamIcon, SieveIcon, CbrIcon, CubeIcon, CompactionIcon,
+  TensionIcon, TorsionIcon, ImpactIcon,
+} from '../components/ExperimentIcons';
 
 const civilExperiments = [
-  { to: '/slump', status: 'Live', code: 'IS 1199', name: 'Slump Test',
+  { to: '/slump', status: 'Live', code: 'IS 1199', name: 'Slump Test', Icon: SlumpIcon,
     desc: 'Adjust the water/cement ratio and watch the concrete cone slump in real time, plotted against the IS 1199 reference curve.' },
-  { to: '/beam', status: 'Live', code: 'IS 456', name: 'Beam Deflection',
+  { to: '/beam', status: 'Live', code: 'IS 456', name: 'Beam Deflection', Icon: BeamIcon,
     desc: 'Set span, load and moment of inertia to see a simply-supported beam deflect, with a live bending moment diagram.' },
-  { to: '/sieve', status: 'Live', code: 'IS 2386', name: 'Sieve Analysis',
+  { to: '/sieve', status: 'Live', code: 'IS 2386', name: 'Sieve Analysis', Icon: SieveIcon,
     desc: 'Enter retained weights per sieve and get percentage passing plus a live grain-size distribution curve.' },
-  { to: '/cbr', status: 'Live', code: 'IS 2720-16', name: 'CBR Test',
+  { to: '/cbr', status: 'Live', code: 'IS 2720-16', name: 'CBR Test', Icon: CbrIcon,
     desc: 'Enter load–penetration readings and read the California Bearing Ratio straight off the plotted curve at 2.5mm and 5mm.' },
-  { to: '/cube', status: 'Live', code: 'IS 516', name: 'Cube Crushing Test',
+  { to: '/cube', status: 'Live', code: 'IS 516', name: 'Cube Crushing Test', Icon: CubeIcon,
     desc: 'Enter the failure load for 3 concrete cubes and check the mean compressive strength against the target grade.' },
-  { to: '/proctor', status: 'Live', code: 'IS 2720-7', name: 'Compaction Test',
+  { to: '/proctor', status: 'Live', code: 'IS 2720-7', name: 'Compaction Test', Icon: CompactionIcon,
     desc: 'Enter moisture content and wet mass readings to plot the Proctor compaction curve and read off OMC and MDD.' },
 ];
 
 const mechanicalExperiments = [
-  { to: '/tension', status: 'Live', code: 'IS 1608', name: 'Tension Test',
+  { to: '/tension', status: 'Live', code: 'IS 1608', name: 'Tension Test', Icon: TensionIcon,
     desc: 'Enter load readings at each extension to build a mild-steel stress-strain curve and read off Young\u2019s modulus, yield strength, UTS, and elongation.' },
-  { to: '/torsion', status: 'Live', code: 'IS 1717', name: 'Torsion Test',
+  { to: '/torsion', status: 'Live', code: 'IS 1717', name: 'Torsion Test', Icon: TorsionIcon,
     desc: 'Enter torque readings at each twist angle to determine the shear modulus of a specimen from the torque-twist curve.' },
-  { to: '/impact', status: 'Live', code: 'IS 1598', name: 'Impact Test (Izod)',
+  { to: '/impact', status: 'Live', code: 'IS 1598', name: 'Impact Test (Izod)', Icon: ImpactIcon,
     desc: 'Enter the pendulum\u2019s rise angle after impact to calculate energy absorbed and classify the specimen\u2019s toughness.' },
 ];
 
@@ -29,11 +33,12 @@ function ExperimentCard({ exp }) {
   const isLive = !!exp.to;
   const Wrapper = isLive ? Link : 'div';
   const props = isLive ? { to: exp.to } : {};
+  const Icon = exp.Icon;
   return (
     <Wrapper className={`card ${isLive ? 'live' : 'locked'}`} {...props}>
       <div className="card-top blueprint">
         <span className="card-status">{exp.status}</span>
-        <i className="ti ti-flask"></i>
+        {Icon ? <Icon /> : <i className="ti ti-flask"></i>}
       </div>
       <div className="card-body">
         <h3>{exp.name}</h3>
@@ -114,7 +119,7 @@ export default function Home() {
             <div className="stepitem">
               <div className="n">04</div>
               <h4>Submit &amp; learn</h4>
-              <p>Take the AI viva, download a lab manual PDF, and save your result to your dashboard.</p>
+              <p>Take the AI viva, download a lab manual PDF, and save your result to your dashboard. New here? Hit "Take the tour" on any experiment page.</p>
             </div>
           </div>
         </div>

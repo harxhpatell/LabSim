@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import heroLogo from '../assets/hero-logo.png';
 
 const civilExperiments = [
   { to: '/slump', status: 'Live', code: 'IS 1199', name: 'Slump Test',
@@ -54,6 +55,7 @@ export default function Home() {
         <span className="tick" style={{ bottom: 18, left: 18 }}>SHEET 01/05</span>
         <span className="tick" style={{ bottom: 18, right: 18 }}>SCALE 1:1</span>
         <div className="hero-inner">
+          <img src={heroLogo} alt="LabSim" style={{ width: 120, height: 'auto', margin: '0 auto 20px', display: 'block' }} />
           <div className="eyebrow" style={{ justifyContent: 'center' }}>NIT AGARTALA · CIVIL &amp; MECHANICAL LABS</div>
           <h1>The lab your college<br />couldn't <span className="accent">afford to build.</span></h1>
           <p>{total} standard code-based experiments, simulated in the browser — concrete slump to steel tension. Built for Tier-2/3 colleges where physical lab access is limited, exam season is short, and a real result should still mean something.</p>

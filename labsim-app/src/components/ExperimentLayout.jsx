@@ -3,20 +3,6 @@ import { Link } from 'react-router-dom';
 import { generateLabManual } from '../utils/generateLabManual';
 import GuidedTour from './GuidedTour';
 
-/**
- * Shared shell for every experiment page.
- *
- * Props:
- *  - title, code, description : header content
- *  - inputs   : left-hand inputs panel content (JSX)
- *  - stage    : right-hand simulation/canvas + graph content (JSX)
- *  - table    : optional bottom observation-table content (JSX)
- *  - viva     : optional AI Viva Coach panel (JSX)
- *  - manualData : optional data object passed straight to generateLabManual() for the PDF button
- *
- * The guided tour is generic — every experiment gets one automatically because
- * they all share this layout. No per-experiment tour config needed.
- */
 export default function ExperimentLayout({ title, code, description, inputs, stage, table, viva, manualData }) {
   const [tourOpen, setTourOpen] = useState(false);
 

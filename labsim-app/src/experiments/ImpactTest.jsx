@@ -5,7 +5,7 @@ import VivaCoach from '../components/VivaCoach';
 import { useAuth } from '../context/AuthContext';
 import { saveAttempt } from '../utils/saveAttempt';
 
-const DEFAULT_RISE_ANGLES = [58, 61, 59]; // degrees, one per trial specimen
+const DEFAULT_RISE_ANGLES = [58, 61, 59];
 
 function toughnessInfo(energy) {
   if (energy < 20) return { label: 'Brittle / Low', color: 'var(--red)', bg: '#3a1616' };
@@ -15,9 +15,9 @@ function toughnessInfo(energy) {
 
 export default function ImpactTest() {
   const { user } = useAuth();
-  const [weight, setWeight] = useState(140); // N
-  const [radius, setRadius] = useState(0.6); // m
-  const [releaseAngle, setReleaseAngle] = useState(90); // degrees
+  const [weight, setWeight] = useState(140);
+  const [radius, setRadius] = useState(0.6);
+  const [releaseAngle, setReleaseAngle] = useState(90);
   const [riseAngles, setRiseAngles] = useState(DEFAULT_RISE_ANGLES);
   const [vivaScore, setVivaScore] = useState(null);
   const diagramRef = useRef(null);
@@ -49,12 +49,10 @@ export default function ImpactTest() {
 
     const g = svg.append('g');
 
-    // pivot mount
     g.append('circle').attr('cx', pivot.x).attr('cy', pivot.y).attr('r', 5).attr('fill', 'var(--muted-2)');
     g.append('text').attr('x', pivot.x).attr('y', pivot.y - 12).attr('text-anchor', 'middle')
       .attr('fill', 'var(--muted-2)').style('font', "9px 'IBM Plex Mono', monospace").text('PIVOT');
 
-    // vertical reference (0°)
     g.append('line').attr('x1', pivot.x).attr('y1', pivot.y).attr('x2', pivot.x).attr('y2', pivot.y + R)
       .attr('stroke', '#3a4a68').attr('stroke-dasharray', '4,4').attr('stroke-width', 1);
 
@@ -63,7 +61,6 @@ export default function ImpactTest() {
       return { x: pivot.x + R * Math.sin(rad), y: pivot.y + R * Math.cos(rad) };
     }
 
-    // release angle arm (alpha) — dashed
     const relEnd = armEnd(releaseAngle);
     g.append('line').attr('x1', pivot.x).attr('y1', pivot.y).attr('x2', relEnd.x).attr('y2', relEnd.y)
       .attr('stroke', 'var(--muted)').attr('stroke-dasharray', '5,4').attr('stroke-width', 1.5);
@@ -71,7 +68,6 @@ export default function ImpactTest() {
     g.append('text').attr('x', relEnd.x).attr('y', relEnd.y - 14).attr('text-anchor', 'middle')
       .attr('fill', 'var(--muted)').style('font', "10px 'IBM Plex Mono', monospace").text(`α=${releaseAngle}°`);
 
-    // rise angle arm (beta, mean) — solid amber
     const riseEnd = armEnd(meanBeta);
     g.append('line').attr('x1', pivot.x).attr('y1', pivot.y).attr('x2', riseEnd.x).attr('y2', riseEnd.y)
       .attr('stroke', 'var(--amber)').attr('stroke-width', 2);
@@ -79,14 +75,12 @@ export default function ImpactTest() {
     g.append('text').attr('x', riseEnd.x).attr('y', riseEnd.y - 14).attr('text-anchor', 'middle')
       .attr('fill', 'var(--amber)').style('font', "10px 'IBM Plex Mono', monospace").text(`β=${meanBeta.toFixed(0)}°`);
 
-    // specimen marker at the bottom (impact point)
     const specimenPos = armEnd(0);
     g.append('rect').attr('x', specimenPos.x - 14).attr('y', specimenPos.y - 4).attr('width', 28).attr('height', 8)
       .attr('fill', 'var(--cyan)').attr('opacity', 0.8);
     g.append('text').attr('x', specimenPos.x).attr('y', specimenPos.y + 22).attr('text-anchor', 'middle')
       .attr('fill', 'var(--cyan)').style('font', "9px 'IBM Plex Mono', monospace").text('SPECIMEN');
 
-    // arc showing the swing between alpha and beta (energy region)
     const arcPath = d3.arc()
       .innerRadius(R * 0.3).outerRadius(R * 0.32)
       .startAngle((meanBeta * Math.PI) / 180).endAngle((releaseAngle * Math.PI) / 180);

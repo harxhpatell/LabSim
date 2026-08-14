@@ -5,7 +5,7 @@ import VivaCoach from '../components/VivaCoach';
 import { useAuth } from '../context/AuthContext';
 import { saveAttempt } from '../utils/saveAttempt';
 
-const E = 25000; // N/mm^2, assumed for M25 concrete
+const E = 25000;
 
 function compute(Lm, Wkn, Icm4) {
   const L = Lm * 1000, W = Wkn * 1000, I = Icm4 * 1e4;

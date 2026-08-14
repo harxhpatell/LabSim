@@ -14,14 +14,14 @@ async function callViva(payload) {
 const TOTAL_QUESTIONS = 3;
 
 export default function VivaCoach({ experimentName, code, resultData, onFinish }) {
-  const [stage, setStage] = useState('idle'); // idle | loading | question | grading | feedback | finished | error
+  const [stage, setStage] = useState('idle');
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const [feedback, setFeedback] = useState(null); // { correct, feedback }
-  const [pendingNext, setPendingNext] = useState(null); // next question text, held until the student clicks Continue
+  const [feedback, setFeedback] = useState(null);
+  const [pendingNext, setPendingNext] = useState(null);
   const [hint, setHint] = useState(null);
   const [hintLoading, setHintLoading] = useState(false);
-  const [history, setHistory] = useState([]); // [{question, correct}]
+  const [history, setHistory] = useState([]);
   const [score, setScore] = useState(0);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -72,7 +72,7 @@ export default function VivaCoach({ experimentName, code, resultData, onFinish }
       setFeedback({ correct: data.correct, feedback: data.feedback });
 
       if (nextHistory.length >= TOTAL_QUESTIONS || !data.nextQuestion) {
-        setPendingNext(null); // no next question — "Continue" will show the final score
+        setPendingNext(null);
       } else {
         setPendingNext(data.nextQuestion);
       }

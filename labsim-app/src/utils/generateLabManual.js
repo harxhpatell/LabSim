@@ -1,27 +1,11 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-// Brand colors (RGB, since jsPDF doesn't read CSS variables)
 const YELLOW = [245, 197, 24];
 const BLACK = [10, 10, 10];
 const GREY = [110, 110, 110];
 const DARK_GREY = [40, 40, 40];
 
-/**
- * Generates and downloads a lab-manual-style PDF for one experiment.
- *
- * @param {Object} opts
- * @param {string} opts.title            e.g. "Slump Test"
- * @param {string} opts.code             e.g. "IS 1199"
- * @param {string} opts.studentName      optional, defaults to "Student"
- * @param {string} opts.aim              one-paragraph aim of the experiment
- * @param {string[]} opts.procedure      ordered list of procedure steps
- * @param {{label:string, value:string}[]} opts.inputsSummary   what the student set
- * @param {{label:string, value:string}[]} opts.resultsSummary  computed results
- * @param {string[]} [opts.tableColumns] observation table headers
- * @param {Array<Array<string|number>>} [opts.tableRows]        observation table rows
- * @param {{score:number, total:number}|null} [opts.vivaScore]  AI viva score, if taken
- */
 export function generateLabManual(opts) {
   const {
     title, code, studentName, aim, procedure = [],
@@ -34,7 +18,6 @@ export function generateLabManual(opts) {
   const margin = 48;
   let y = 0;
 
-  // ---- header band ----
   doc.setFillColor(...BLACK);
   doc.rect(0, 0, pageWidth, 84, 'F');
   doc.setFillColor(...YELLOW);
@@ -61,7 +44,6 @@ export function generateLabManual(opts) {
 
   y = 112;
 
-  // ---- title + student ----
   doc.setTextColor(...BLACK);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
@@ -74,7 +56,6 @@ export function generateLabManual(opts) {
   doc.text(`Student: ${studentName || 'Student'}`, margin, y);
   y += 22;
 
-  // ---- aim ----
   if (aim) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -89,7 +70,6 @@ export function generateLabManual(opts) {
     y += aimLines.length * 13 + 12;
   }
 
-  // ---- procedure ----
   if (procedure.length) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -107,7 +87,6 @@ export function generateLabManual(opts) {
     y += 8;
   }
 
-  // ---- inputs / results as two-column key-value blocks ----
   function keyValueBlock(heading, rows) {
     if (!rows.length) return;
     doc.setFont('helvetica', 'bold');
@@ -129,7 +108,6 @@ export function generateLabManual(opts) {
   keyValueBlock('Inputs', inputsSummary);
   keyValueBlock('Results', resultsSummary);
 
-  // ---- observation table ----
   if (tableColumns && tableRows && tableRows.length) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -148,7 +126,6 @@ export function generateLabManual(opts) {
     y = doc.lastAutoTable.finalY + 20;
   }
 
-  // ---- viva score ----
   if (vivaScore) {
     if (y > doc.internal.pageSize.getHeight() - 100) { doc.addPage(); y = margin; }
     doc.setFont('helvetica', 'bold');
@@ -165,7 +142,6 @@ export function generateLabManual(opts) {
     y += 30;
   }
 
-  // ---- footer ----
   const pageCount = doc.internal.getNumberOfPages();
   for (let p = 1; p <= pageCount; p++) {
     doc.setPage(p);

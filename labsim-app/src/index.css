@@ -51,7 +51,6 @@ button{font-family:inherit;cursor:pointer}
   background-position:-1px -1px;
 }
 
-/* ---------------- nav ---------------- */
 .topnav{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:16px 24px;border-bottom:1px solid var(--border);background:var(--panel);
@@ -74,7 +73,6 @@ button{font-family:inherit;cursor:pointer}
 .nav-gh{font-family:var(--font-mono);font-size:12px;color:var(--muted);border:1px solid var(--border);padding:6px 12px;border-radius:6px;white-space:nowrap}
 .nav-gh:hover{border-color:var(--cyan-dim);color:var(--cyan)}
 
-/* Discipline dropdown groups (Civil / Mechanical) */
 .nav-dropdown{position:relative}
 .nav-dropdown-trigger{
   display:flex;align-items:center;gap:5px;background:transparent;border:none;
@@ -94,7 +92,6 @@ button{font-family:inherit;cursor:pointer}
 }
 .nav-dropdown-panel a:hover, .nav-dropdown-panel a.active{background:var(--panel-2);color:var(--cyan)}
 
-/* Hamburger toggle — hidden on desktop, shown on mobile */
 .nav-toggle{
   display:none;flex-direction:column;justify-content:center;gap:5px;
   width:36px;height:36px;padding:0;background:transparent;border:1px solid var(--border);border-radius:6px;
@@ -125,7 +122,6 @@ button{font-family:inherit;cursor:pointer}
   .mobile-menu .nav-gh{display:block;text-align:center;margin:14px 24px 18px}
 }
 
-/* ---------------- footer ---------------- */
 footer{
   border-top:1px solid var(--border);padding:28px 32px;
   display:flex;align-items:center;justify-content:space-between;
@@ -134,7 +130,6 @@ footer{
 footer a{color:var(--muted);border-bottom:1px dotted var(--muted-2)}
 footer a:hover{color:var(--cyan)}
 
-/* ---------------- layout helpers ---------------- */
 .wrap{max-width:1120px;margin:0 auto;padding:0 32px}
 .eyebrow{
   font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
@@ -156,7 +151,6 @@ footer a:hover{color:var(--cyan)}
 .backlink{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:12px;color:var(--muted);padding:16px 32px 0}
 .backlink:hover{color:var(--cyan)}
 
-/* ---------------- hero (home page) ---------------- */
 .hero{padding:72px 32px 88px;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
 .hero-inner{max-width:720px;margin:0 auto;text-align:center;position:relative;z-index:2}
 .hero h1{font-size:clamp(32px,5vw,52px);font-weight:700;letter-spacing:-0.02em;line-height:1.08;margin-bottom:18px}
@@ -169,7 +163,6 @@ footer a:hover{color:var(--cyan)}
 .stat span{font-size:11px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.06em}
 .tick{position:absolute;font-family:var(--font-mono);font-size:10px;color:var(--muted-2)}
 
-/* ---------------- experiment cards ---------------- */
 .section{padding:64px 32px}
 .section h2{font-size:22px;font-weight:600;margin-bottom:6px;letter-spacing:-.01em}
 .section .sub{color:var(--muted);font-size:14px;margin-bottom:36px}
@@ -193,7 +186,6 @@ footer a:hover{color:var(--cyan)}
 .stepitem h4{font-size:14px;font-weight:600;margin-bottom:6px}
 .stepitem p{font-size:12.5px;color:var(--muted);line-height:1.6}
 
-/* ---------------- ExperimentLayout ---------------- */
 .lab-header{padding:24px 32px 0}
 .lab-title{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px}
 .lab-title h1{font-size:24px;font-weight:700;letter-spacing:-.01em}
@@ -242,7 +234,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .axis text{fill:var(--muted-2);font-family:var(--font-mono);font-size:9.5px}
 .grid-line{stroke:var(--grid-line);stroke-width:1}
 
-/* ---------------- observation table (shared) ---------------- */
 .obs-panel{border:1px solid var(--border);border-radius:var(--radius);background:var(--panel);padding:20px;max-width:1120px;margin:0 auto 56px;margin-left:32px;margin-right:32px}
 @media (min-width:1184px){.obs-panel{margin-left:auto;margin-right:auto}}
 .obs-panel h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px;font-weight:600}
@@ -254,7 +245,6 @@ table.obs-table td input{width:80px;background:var(--panel-2);border:1px solid v
 table.obs-table td input:focus{outline:none;border-color:var(--cyan-dim)}
 .row-actions{display:flex;gap:8px;margin-top:12px}
 
-/* ---------------- AI Viva Coach ---------------- */
 .viva-panel{
   border:1px solid var(--cyan-dim);border-radius:var(--radius);background:var(--panel);
   padding:20px;max-width:1120px;margin:0 32px 56px;
@@ -287,7 +277,6 @@ table.obs-table td input:focus{outline:none;border-color:var(--cyan-dim)}
 
 .manual-btn{margin-left:auto}
 
-/* ---------------- Guided Tour ---------------- */
 .tour-overlay{
   position:fixed; inset:0; z-index:100; cursor:pointer;
 }
@@ -309,7 +298,6 @@ table.obs-table td input:focus{outline:none;border-color:var(--cyan-dim)}
 .tour-tooltip-actions{display:flex; justify-content:space-between; align-items:center}
 .tour-tooltip.centered{top:50%; left:50%; transform:translate(-50%,-50%)}
 
-/* ---------------- experiment preview icon animations ---------------- */
 @keyframes slump-squash{
   0%, 15%{transform:scaleY(1) scaleX(1)}
   45%{transform:scaleY(0.55) scaleX(1.35)}
@@ -375,9 +363,6 @@ table.obs-table td input:focus{outline:none;border-color:var(--cyan-dim)}
 }
 .anim-pendulum{animation:pendulum-swing 1.8s ease-in-out infinite}
 
-/* ==================================================================
-   Mobile responsiveness pass — tighter padding, no horizontal overflow
-   ================================================================== */
 @media (max-width:640px){
   .wrap{padding:0 16px}
   .backlink{padding:14px 16px 0}
@@ -386,8 +371,7 @@ table.obs-table td input:focus{outline:none;border-color:var(--cyan-dim)}
   .hero h1{font-size:clamp(26px,8vw,38px)}
   .hero p{font-size:14.5px;padding:0 4px}
   .hero-stats{gap:24px;margin-top:40px}
-  .tick{display:none} /* decorative corner coordinates — just clutter on small screens */
-
+  .tick{display:none}
   .section{padding:40px 16px}
   .section h2{font-size:19px}
 

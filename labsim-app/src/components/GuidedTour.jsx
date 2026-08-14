@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
 
-/**
- * Generic guided tour. Pass an array of steps:
- *   { selector: '[data-tour="tour-inputs"]' | null, title, body }
- * A null selector centers the tooltip on screen (used for the welcome step).
- */
 export default function GuidedTour({ steps, onClose }) {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState(null);
@@ -18,7 +13,6 @@ export default function GuidedTour({ steps, onClose }) {
       const el = document.querySelector(step.selector);
       if (!el) { setRect(null); return; }
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // slight delay so the scroll finishes before we measure position
       setTimeout(() => {
         const r = el.getBoundingClientRect();
         setRect({ top: r.top - 8, left: r.left - 8, width: r.width + 16, height: r.height + 16 });
@@ -37,7 +31,6 @@ export default function GuidedTour({ steps, onClose }) {
     setIndex(i => Math.max(0, i - 1));
   }
 
-  // tooltip position: below the spotlight if there's room, else above; centered if no target
   const tooltipStyle = rect
     ? {
         top: rect.top + rect.height + 16 + window.scrollY > window.innerHeight + window.scrollY - 180

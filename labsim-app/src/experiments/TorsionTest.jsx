@@ -5,16 +5,13 @@ import VivaCoach from '../components/VivaCoach';
 import { useAuth } from '../context/AuthContext';
 import { saveAttempt } from '../utils/saveAttempt';
 
-// Fixed angle-of-twist readings (degrees) — student enters the torque (N·mm) recorded at each.
-// Defaults trace a straight line through the origin (purely elastic range) for a
-// specimen with G ≈ 80,000 N/mm² (typical mild steel).
 const ANGLES_DEG = [2, 4, 6, 8, 10, 12, 14, 16];
-const DEFAULT_TORQUES = [74, 148, 222, 296, 370, 444, 518, 592]; // N·mm
+const DEFAULT_TORQUES = [74, 148, 222, 296, 370, 444, 518, 592];
 
 export default function TorsionTest() {
   const { user } = useAuth();
-  const [diameter, setDiameter] = useState(3); // mm
-  const [gaugeLength, setGaugeLength] = useState(300); // mm
+  const [diameter, setDiameter] = useState(3);
+  const [gaugeLength, setGaugeLength] = useState(300);
   const [torques, setTorques] = useState(DEFAULT_TORQUES);
   const [vivaScore, setVivaScore] = useState(null);
   const graphRef = useRef(null);
@@ -25,14 +22,14 @@ export default function TorsionTest() {
     setTorques(next);
   }
 
-  const J = (Math.PI * Math.pow(diameter, 4)) / 32; // mm⁴, polar moment of inertia
+  const J = (Math.PI * Math.pow(diameter, 4)) / 32;
   const radius = diameter / 2;
 
   const rows = ANGLES_DEG.map((deg, i) => {
     const rad = (deg * Math.PI) / 180;
-    const shearStress = (torques[i] * radius) / J; // N/mm²
+    const shearStress = (torques[i] * radius) / J;
     const shearStrain = (radius * rad) / gaugeLength;
-    const G = rad > 0 ? (torques[i] * gaugeLength) / (J * rad) : 0; // N/mm²
+    const G = rad > 0 ? (torques[i] * gaugeLength) / (J * rad) : 0;
     return { angleDeg: deg, angleRad: rad, torque: torques[i], shearStress, shearStrain, G };
   });
 

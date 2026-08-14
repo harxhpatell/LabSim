@@ -5,7 +5,6 @@ import VivaCoach from '../components/VivaCoach';
 import { useAuth } from '../context/AuthContext';
 import { saveAttempt } from '../utils/saveAttempt';
 
-// Simplified IS 1199 relationship: slump (mm) = (w/c ratio − 0.40) × 200, clamped 0–80
 function computeSlump(wc) {
   return Math.max(0, Math.min(80, (wc - 0.40) * 200));
 }
@@ -27,7 +26,6 @@ export default function SlumpTest() {
   const slump = computeSlump(wc);
   const info = workabilityInfo(slump);
 
-  // ---- draw the cone on canvas whenever slump changes ----
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -91,7 +89,6 @@ export default function SlumpTest() {
     ctx.fillText('300mm mould', cx, mouldTopY - 14);
   }, [slump]);
 
-  // ---- D3 graph, rebuilt on resize, updated on wc change ----
   useEffect(() => {
     const container = graphRef.current;
     if (!container) return;

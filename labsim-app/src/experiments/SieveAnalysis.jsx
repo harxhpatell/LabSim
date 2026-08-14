@@ -5,7 +5,6 @@ import VivaCoach from '../components/VivaCoach';
 import { useAuth } from '../context/AuthContext';
 import { saveAttempt } from '../utils/saveAttempt';
 
-// Standard IS 2386 sieve set. "plotSize" gives Pan a nominal position for the log-scale curve.
 const SIEVES = [
   { label: '4.75 mm', size: 4.75, plotSize: 4.75 },
   { label: '2.36 mm', size: 2.36, plotSize: 2.36 },
@@ -16,7 +15,7 @@ const SIEVES = [
   { label: 'Pan', size: 0, plotSize: 0.075 },
 ];
 
-const DEFAULT_RETAINED = [45, 120, 180, 260, 210, 130, 55]; // grams, sums to 1000g sample
+const DEFAULT_RETAINED = [45, 120, 180, 260, 210, 130, 55];
 
 export default function SieveAnalysis() {
   const { user } = useAuth();
@@ -31,7 +30,6 @@ export default function SieveAnalysis() {
     setRetained(next);
   }
 
-  // ---- derived rows: % retained, cumulative % retained, % passing ----
   let cumulative = 0;
   const rows = SIEVES.map((s, i) => {
     const w = retained[i] || 0;
@@ -42,7 +40,6 @@ export default function SieveAnalysis() {
   });
 
   const sumRetained = retained.reduce((a, b) => a + (b || 0), 0);
-  // Fineness modulus = sum of cumulative % retained on the six standard sieves (excludes pan) / 100
   const finenessModulus = rows.slice(0, 6).reduce((a, r) => a + r.cumulative, 0) / 100;
 
   useEffect(() => {

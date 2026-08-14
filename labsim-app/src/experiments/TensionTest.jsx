@@ -5,16 +5,13 @@ import VivaCoach from '../components/VivaCoach';
 import { useAuth } from '../context/AuthContext';
 import { saveAttempt } from '../utils/saveAttempt';
 
-// Fixed extension readings (mm) — student enters the load (kN) recorded at each.
-// Defaults trace a realistic mild-steel curve: elastic rise, yield plateau, strain
-// hardening to UTS, then necking down to fracture.
-const EXTENSIONS = [0.03, 0.06, 0.085, 1.2, 3, 6, 9, 10.8, 12.6, 14.4]; // mm
-const DEFAULT_LOADS = [10, 20, 28.3, 28.3, 32, 38, 44, 46.4, 44, 40]; // kN
+const EXTENSIONS = [0.03, 0.06, 0.085, 1.2, 3, 6, 9, 10.8, 12.6, 14.4];
+const DEFAULT_LOADS = [10, 20, 28.3, 28.3, 32, 38, 44, 46.4, 44, 40];
 
 export default function TensionTest() {
   const { user } = useAuth();
-  const [diameter, setDiameter] = useState(12); // mm
-  const [gaugeLength, setGaugeLength] = useState(60); // mm
+  const [diameter, setDiameter] = useState(12);
+  const [gaugeLength, setGaugeLength] = useState(60);
   const [loads, setLoads] = useState(DEFAULT_LOADS);
   const [vivaScore, setVivaScore] = useState(null);
   const graphRef = useRef(null);
@@ -25,19 +22,18 @@ export default function TensionTest() {
     setLoads(next);
   }
 
-  const area = (Math.PI / 4) * diameter * diameter; // mm²
+  const area = (Math.PI / 4) * diameter * diameter;
   const rows = EXTENSIONS.map((ext, i) => ({
     extension: ext,
     load: loads[i],
-    stress: (loads[i] * 1000) / area, // N/mm²
+    stress: (loads[i] * 1000) / area,
     strainPct: (ext / gaugeLength) * 100,
   }));
 
-  // Young's modulus from the first two (clearly elastic) readings.
   const E = rows[1].stress / (rows[1].strainPct / 100 || 1e-9);
-  const yieldStress = rows[2].stress; // load stops rising at the plateau onset
+  const yieldStress = rows[2].stress;
   const uts = Math.max(...rows.map(r => r.stress));
-  const elongationPct = rows[rows.length - 1].strainPct; // simplified: strain at final (fracture) reading
+  const elongationPct = rows[rows.length - 1].strainPct;
 
   useEffect(() => {
     const container = graphRef.current;
@@ -73,7 +69,6 @@ export default function TensionTest() {
       .attr('cx', d => x(d.strainPct)).attr('cy', d => y(d.stress)).attr('r', 3.5)
       .attr('fill', '#0a0a0a').attr('stroke', 'var(--cyan)').attr('stroke-width', 2);
 
-    // mark yield and UTS points
     const utsRow = rows.reduce((a, b) => (b.stress > a.stress ? b : a), rows[0]);
     [{ row: rows[2], label: 'Yield' }, { row: utsRow, label: 'UTS' }].forEach(({ row, label }) => {
       g.append('circle').attr('cx', x(row.strainPct)).attr('cy', y(row.stress)).attr('r', 5)

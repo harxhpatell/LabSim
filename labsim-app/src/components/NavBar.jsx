@@ -51,7 +51,6 @@ export default function NavBar() {
     setOpenGroup(null);
   }
 
-  // close an open dropdown if the user clicks outside the nav
   useEffect(() => {
     function onClick(e) {
       if (navRef.current && !navRef.current.contains(e.target)) setOpenGroup(null);

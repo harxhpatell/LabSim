@@ -1,6 +1,3 @@
-// Small looping SVG animations for the Home page experiment cards.
-// Each one hints at the actual physical phenomenon the experiment simulates —
-// not decorative, a genuine (if simplified) preview of what happens.
 
 export function SlumpIcon() {
   return (

@@ -5,13 +5,11 @@ import VivaCoach from '../components/VivaCoach';
 import { useAuth } from '../context/AuthContext';
 import { saveAttempt } from '../utils/saveAttempt';
 
-// Standard IS 2720-16 penetration set (mm) with plausible default loads (kN)
-// yielding ~8% CBR at both 2.5mm and 5mm.
 const PENETRATIONS = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 7.5, 10, 12.5];
 const DEFAULT_LOADS = [0.20, 0.45, 0.68, 0.88, 1.06, 1.22, 1.42, 1.59, 1.95, 2.20, 2.40];
 
-const STD_LOAD_2_5 = 13.24; // kN, standard load for 100% CBR at 2.5mm
-const STD_LOAD_5_0 = 19.93; // kN, standard load for 100% CBR at 5.0mm
+const STD_LOAD_2_5 = 13.24;
+const STD_LOAD_5_0 = 19.93;
 
 function interp(loads, target) {
   for (let i = 0; i < PENETRATIONS.length - 1; i++) {
@@ -79,7 +77,6 @@ export default function CBR() {
       .attr('cx', d => x(d.p)).attr('cy', d => y(d.load)).attr('r', 3.5)
       .attr('fill', '#0a0a0a').attr('stroke', 'var(--cyan)').attr('stroke-width', 2);
 
-    // markers at 2.5mm and 5mm
     [[2.5, load2_5], [5.0, load5_0]].forEach(([p, l]) => {
       g.append('line').attr('x1', x(p)).attr('x2', x(p)).attr('y1', h).attr('y2', y(l))
         .attr('stroke', 'var(--amber)').attr('stroke-dasharray', '3,3').attr('stroke-width', 1);

@@ -5,10 +5,10 @@ import VivaCoach from '../components/VivaCoach';
 import { useAuth } from '../context/AuthContext';
 import { saveAttempt } from '../utils/saveAttempt';
 
-const GRADES = [15, 20, 25, 30, 35, 40]; // fck, N/mm²
+const GRADES = [15, 20, 25, 30, 35, 40];
 const CUBE_SIDE_MM = 150;
-const AREA = CUBE_SIDE_MM * CUBE_SIDE_MM; // mm²
-const DEFAULT_LOADS = [620, 610, 630]; // kN, gives ~27.5 N/mm² average — passes M25
+const AREA = CUBE_SIDE_MM * CUBE_SIDE_MM;
+const DEFAULT_LOADS = [620, 610, 630];
 
 export default function CubeCrushing() {
   const { user } = useAuth();
@@ -23,10 +23,9 @@ export default function CubeCrushing() {
     setLoads(next);
   }
 
-  const strengths = loads.map(l => (l * 1000) / AREA); // N/mm²
+  const strengths = loads.map(l => (l * 1000) / AREA);
   const avgStrength = strengths.reduce((a, b) => a + b, 0) / strengths.length;
   const pass = avgStrength >= fck;
-  // Simplified consistency flag (not a strict IS 456 clause) — flags an outlier cube for the student to notice.
   const hasOutlier = strengths.some(s => s < avgStrength * 0.85);
 
   useEffect(() => {
@@ -54,7 +53,6 @@ export default function CubeCrushing() {
       .attr('text-anchor', 'middle').attr('fill', 'var(--muted-2)')
       .style('font', "10px 'IBM Plex Mono', monospace").text('strength (N/mm²)');
 
-    // target fck reference line
     g.append('line').attr('x1', 0).attr('x2', w).attr('y1', y(fck)).attr('y2', y(fck))
       .attr('stroke', 'var(--amber)').attr('stroke-dasharray', '5,4').attr('stroke-width', 1.5);
     g.append('text').attr('x', w - 4).attr('y', y(fck) - 6).attr('text-anchor', 'end')

@@ -5,9 +5,9 @@ import VivaCoach from '../components/VivaCoach';
 import { useAuth } from '../context/AuthContext';
 import { saveAttempt } from '../utils/saveAttempt';
 
-const MOULD_VOLUME_CC = 1000; // standard Proctor mould, cm³
+const MOULD_VOLUME_CC = 1000;
 const MOISTURE_PCT = [8, 10, 12, 14, 16, 18];
-const DEFAULT_WET_MASS = [1750, 1850, 1920, 1960, 1940, 1880]; // grams, gives a peak around 14%
+const DEFAULT_WET_MASS = [1750, 1850, 1920, 1960, 1940, 1880];
 
 export default function CompactionTest() {
   const { user } = useAuth();
@@ -22,12 +22,11 @@ export default function CompactionTest() {
   }
 
   const rows = MOISTURE_PCT.map((mc, i) => {
-    const bulkDensity = wetMass[i] / MOULD_VOLUME_CC; // g/cm³
-    const dryDensity = bulkDensity / (1 + mc / 100); // g/cm³
+    const bulkDensity = wetMass[i] / MOULD_VOLUME_CC;
+    const dryDensity = bulkDensity / (1 + mc / 100);
     return { moisture: mc, wetMass: wetMass[i], bulkDensity, dryDensity };
   });
 
-  // Peak of the entered data points — a reasonable estimate of OMC/MDD for a teaching simulator.
   const peak = rows.reduce((best, r) => (r.dryDensity > best.dryDensity ? r : best), rows[0]);
 
   useEffect(() => {
@@ -67,7 +66,6 @@ export default function CompactionTest() {
       .attr('cx', d => x(d.moisture)).attr('cy', d => y(d.dryDensity)).attr('r', 4)
       .attr('fill', '#0a0a0a').attr('stroke', 'var(--cyan)').attr('stroke-width', 2);
 
-    // OMC / MDD marker
     g.append('line').attr('x1', x(peak.moisture)).attr('x2', x(peak.moisture)).attr('y1', h).attr('y2', y(peak.dryDensity))
       .attr('stroke', 'var(--amber)').attr('stroke-dasharray', '3,3').attr('stroke-width', 1);
     g.append('circle').attr('cx', x(peak.moisture)).attr('cy', y(peak.dryDensity)).attr('r', 5)
